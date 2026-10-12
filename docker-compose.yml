@@ -1,0 +1,38 @@
+services:
+  clientes:
+    build: ./clientes
+    container_name: equipo1-clientes
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: "3001"
+      DATABASE_PATH: /data/clientes.db
+    volumes:
+      - clientes_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:3001/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  productos:
+    build: ./productos
+    container_name: equipo1-productos
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: "3002"
+      DATABASE_PATH: /data/productos.db
+    volumes:
+      - productos_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:3002/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  clientes_data:
+  productos_data:
