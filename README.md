@@ -99,3 +99,29 @@ docker compose down -v
 
 ## Nota de red
 Desde otra computadora, sustituye `localhost` por la IP de la laptop que ejecuta Docker, y permite los puertos TCP 3001 y 3002 en el firewall de Windows.
+
+
+## Contrato de integración con los equipos 2 y 3
+
+Las direcciones base son `http://IP-DEL-EQUIPO-1:3001` para Clientes y
+`http://IP-DEL-EQUIPO-1:3002` para Productos. Sustituye la IP de ejemplo por
+la IPv4 real de esta computadora; no uses `localhost` desde otra computadora.
+
+### Clientes
+- `GET /clientes` y `GET /clientes/:id`
+- `POST /clientes` acepta `{ "nombre": "...", "correo": "..." }` y también
+  `{ "nombre": "...", "email": "..." }` para compatibilidad con Equipo 2.
+- Las respuestas incluyen `correo` y `email` con el mismo valor para que
+  clientes existentes de los otros equipos puedan leer cualquiera de los dos.
+
+### Productos
+- `GET /productos` y `GET /productos/:id`
+- `POST /productos` acepta `{ "nombre": "...", "precio": 100, "stock": 5 }`.
+  `stock` es opcional y toma el valor 0 si se omite, porque el stock definitivo
+  debe consultarse y actualizarse en el microservicio Inventario del Equipo 3.
+- Los precios se devuelven como `precio`, compatible con el servicio Pedidos del Equipo 2.
+
+### Comunicación entre computadoras
+Permite los puertos TCP 3001 y 3002 en el firewall de Windows. Desde otra PC
+prueba `http://IP-DEL-EQUIPO-1:3001/health` y
+`http://IP-DEL-EQUIPO-1:3002/health`.
