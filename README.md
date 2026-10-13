@@ -74,7 +74,7 @@ Ambos servicios tienen:
 - `PUT /<recurso>/<id>`: reemplaza los campos editables.
 - `DELETE /<recurso>/<id>`: elimina un registro.
 
-Clientes usa `nombre` y `correo`. Productos usa `nombre`, `precio` y `stock`.
+Contrato único de datos (nombres en español): Clientes usa `id`, `nombre` y `correo`; Productos usa `id`, `nombre`, `precio` y `stock`. No se deben usar alias como `email`, `name` o `price` en las solicitudes entre servicios.
 
 ## Administración
 
@@ -112,14 +112,12 @@ la IPv4 real de esta computadora; no uses `localhost` desde otra computadora.
 
 ### Clientes
 - `GET /clientes` y `GET /clientes/:id`
-- `POST /clientes` acepta `{ "nombre": "...", "correo": "..." }` y también
-  `{ "nombre": "...", "email": "..." }` para compatibilidad con Equipo 2.
-- Las respuestas incluyen `correo` y `email` con el mismo valor para que
-  clientes existentes de los otros equipos puedan leer cualquiera de los dos.
+- `POST /clientes` y `PUT /clientes/:id` usan exclusivamente `{ "nombre": "...", "correo": "..." }`.
+- La respuesta devuelve exclusivamente `id`, `nombre` y `correo`. `correo` es el nombre oficial del campo de correo electrónico para los tres equipos.
 
 ### Productos
 - `GET /productos` y `GET /productos/:id`
-- `POST /productos` acepta `{ "nombre": "...", "precio": 100, "stock": 5 }`.
+- `POST /productos` y `PUT /productos/:id` usan `{ "nombre": "...", "precio": 100, "stock": 5 }`. Los nombres oficiales son `nombre` y `precio` (no `name` ni `price`).
   `stock` es opcional y toma el valor 0 si se omite, porque el stock definitivo
   debe consultarse y actualizarse en el microservicio Inventario del Equipo 3.
 - Los precios se devuelven como `precio`, compatible con el servicio Pedidos del Equipo 2.
