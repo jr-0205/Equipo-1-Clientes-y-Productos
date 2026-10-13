@@ -1,8 +1,8 @@
-FROM python:3.12-slim
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+FROM node:20-bookworm-slim
+ENV NODE_ENV=production
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY app.py .
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY app.js ./
 EXPOSE 3002
-CMD ["python", "app.py"]
+CMD ["npm", "start"]
