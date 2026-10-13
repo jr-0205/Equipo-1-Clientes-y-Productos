@@ -89,9 +89,9 @@ def create_product():
     nombre = str(data.get("nombre", "")).strip()
     try:
         precio = float(data.get("precio"))
-        stock = int(data.get("stock"))
+        stock = int(data.get("stock", 0))
     except (TypeError, ValueError):
-        return jsonify({"error": "Los campos 'precio' y 'stock' deben ser números"}), 400
+        return jsonify({"error": "El precio debe ser numérico y stock, si se envía, debe ser entero"}), 400
     if not nombre or precio < 0 or stock < 0:
         return jsonify({"error": "Nombre obligatorio; precio y stock deben ser cero o mayores"}), 400
     with connect_db() as db:
