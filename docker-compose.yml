@@ -3,7 +3,7 @@ services:
     build: ./clientes
     container_name: equipo1-clientes
     ports:
-      - "3001:3001"
+      - "2501:3001"
     environment:
       PORT: "3001"
       DATABASE_PATH: /data/clientes.db
@@ -20,7 +20,7 @@ services:
     build: ./productos
     container_name: equipo1-productos
     ports:
-      - "3002:3002"
+      - "2502:3002"
     environment:
       PORT: "3002"
       DATABASE_PATH: /data/productos.db
