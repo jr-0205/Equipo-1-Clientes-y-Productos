@@ -38,7 +38,7 @@ def init_db():
 
 
 def serialize(row):
-    return {"id": row["id"], "nombre": row["nombre"], "correo": row["correo"]}
+    return {"id": row["id"], "nombre": row["nombre"], "correo": row["correo"], "email": row["correo"]}
 
 
 @app.get("/")
@@ -81,7 +81,7 @@ def get_client(client_id):
 def create_client():
     data = request.get_json(silent=True) or {}
     nombre = str(data.get("nombre", "")).strip()
-    correo = str(data.get("correo", "")).strip().lower()
+    correo = str(data.get("correo", data.get("email", ""))).strip().lower()
     if not nombre or not correo:
         return jsonify({"error": "Los campos 'nombre' y 'correo' son obligatorios"}), 400
     try:
