@@ -1,10 +1,13 @@
 # Equipo 1: Microservicios de Clientes y Productos
 
-Proyecto creado desde cero con dos microservicios Flask, cada uno con su propia base de datos SQLite persistente y ejecutados con Docker Compose.
+Proyecto de dos microservicios Node.js + Express, cada uno con su propia base de datos SQLite persistente y ejecutados con Docker Compose.
 
-## Requisitos
-- Docker Desktop con Docker Compose v2
-- Git (para clonar el repositorio)
+## Tecnologías
+- Node.js 20 y Express
+- APIs REST con JSON
+- SQLite independiente para cada servicio
+- Docker y Docker Compose v2
+- Postman para pruebas HTTP
 
 ## Arquitectura
 
