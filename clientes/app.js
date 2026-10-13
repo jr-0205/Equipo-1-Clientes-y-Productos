@@ -57,7 +57,7 @@ app.post('/clientes', async (req, res, next) => {
 app.put('/clientes/:id', async (req, res, next) => {
   const nombre = String(req.body?.nombre || '').trim();
   const correo = String(req.body?.correo || '').trim().toLowerCase();
-  if (!nombre || !correo) return res.status(400).json({ error: "Los campos 'nombre' y 'correo/email' son obligatorios" });
+  if (!nombre || !correo) return res.status(400).json({ error: "Los campos 'nombre' y 'correo' son obligatorios" });
   try {
     const result = await run('UPDATE clientes SET nombre = ?, correo = ? WHERE id = ?', [nombre, correo, Number(req.params.id)]);
     if (!result.changes) return res.status(404).json({ error: 'Cliente no encontrado' });
