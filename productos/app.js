@@ -24,8 +24,8 @@ const get = (sql, params = []) => new Promise((resolve, reject) =>
 );
 const serialize = row => ({ id: row.id, nombre: row.nombre, precio: row.precio, stock: row.stock });
 function parseProduct(body) {
-  const nombre = String(body?.nombre || body?.name || '').trim();
-  const precio = Number(body?.precio ?? body?.price);
+  const nombre = String(body?.nombre || '').trim();
+  const precio = Number(body?.precio);
   const stock = Number(body?.stock ?? 0);
   if (!nombre) return { error: 'El nombre del producto es obligatorio' };
   if (!Number.isFinite(precio) || precio < 0) return { error: 'El precio debe ser numérico y mayor o igual a cero' };
