@@ -43,7 +43,7 @@ app.get('/clientes/:id', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 app.post('/clientes', async (req, res, next) => {
-  const nombre = String(req.body?.nombre || req.body?.name || '').trim();
+  const nombre = String(req.body?.nombre || '').trim();
   const correo = String(req.body?.correo || '').trim().toLowerCase();
   if (!nombre || !correo) return res.status(400).json({ error: "Los campos 'nombre' y 'correo' son obligatorios" });
   try {
@@ -55,8 +55,8 @@ app.post('/clientes', async (req, res, next) => {
   }
 });
 app.put('/clientes/:id', async (req, res, next) => {
-  const nombre = String(req.body?.nombre || req.body?.name || '').trim();
-  const correo = String(req.body?.correo || req.body?.email || '').trim().toLowerCase();
+  const nombre = String(req.body?.nombre || '').trim();
+  const correo = String(req.body?.correo || '').trim().toLowerCase();
   if (!nombre || !correo) return res.status(400).json({ error: "Los campos 'nombre' y 'correo/email' son obligatorios" });
   try {
     const result = await run('UPDATE clientes SET nombre = ?, correo = ? WHERE id = ?', [nombre, correo, Number(req.params.id)]);
