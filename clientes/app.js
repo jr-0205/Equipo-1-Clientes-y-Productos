@@ -22,7 +22,7 @@ const all = (sql, params = []) => new Promise((resolve, reject) =>
 const get = (sql, params = []) => new Promise((resolve, reject) =>
   db.get(sql, params, (err, row) => err ? reject(err) : resolve(row))
 );
-const serialize = row => ({ id: row.id, nombre: row.nombre, correo: row.correo, email: row.correo });
+const serialize = row => ({ id: row.id, nombre: row.nombre, correo: row.correo });
 
 app.get('/', (req, res) => res.json({
   servicio: 'Equipo 1 - Clientes',
@@ -44,8 +44,8 @@ app.get('/clientes/:id', async (req, res, next) => {
 });
 app.post('/clientes', async (req, res, next) => {
   const nombre = String(req.body?.nombre || req.body?.name || '').trim();
-  const correo = String(req.body?.correo || req.body?.email || '').trim().toLowerCase();
-  if (!nombre || !correo) return res.status(400).json({ error: "Los campos 'nombre' y 'correo/email' son obligatorios" });
+  const correo = String(req.body?.correo || '').trim().toLowerCase();
+  if (!nombre || !correo) return res.status(400).json({ error: "Los campos 'nombre' y 'correo' son obligatorios" });
   try {
     const result = await run('INSERT INTO clientes (nombre, correo) VALUES (?, ?)', [nombre, correo]);
     res.status(201).json(serialize(await get('SELECT * FROM clientes WHERE id = ?', [result.lastID])));
