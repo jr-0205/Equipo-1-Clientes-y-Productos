@@ -11,10 +11,10 @@ Proyecto de dos microservicios Node.js + Express, cada uno con su propia base de
 
 ## Arquitectura
 
-| Servicio | Puerto local | Base de datos | Función |
+| Servicio | Puerto publicado | Puerto interno | Base de datos | Función |
 |---|---:|---|---|
-| Clientes | 3001 | SQLite (`clientes_data`) | CRUD de clientes |
-| Productos | 3002 | SQLite (`productos_data`) | CRUD de productos |
+| Clientes | 2501 | 3001 | SQLite (`clientes_data`) | CRUD de clientes |
+| Productos | 2502 | 3002 | SQLite (`productos_data`) | CRUD de productos |
 
 Cada servicio es independiente. Los datos se guardan en volúmenes Docker para sobrevivir al reinicio de los contenedores.
 
@@ -30,12 +30,12 @@ docker compose ps
 ## Probar que funcionan
 
 Abre estas direcciones en el navegador:
-- http://localhost:3001/
-- http://localhost:3001/health
-- http://localhost:3001/clientes
-- http://localhost:3002/
-- http://localhost:3002/health
-- http://localhost:3002/productos
+- http://localhost:2501/
+- http://localhost:2501/health
+- http://localhost:2501/clientes
+- http://localhost:2502/
+- http://localhost:2502/health
+- http://localhost:2502/productos
 
 Los servicios incluyen datos de ejemplo al inicializar una base vacía.
 
@@ -43,24 +43,24 @@ Los servicios incluyen datos de ejemplo al inicializar una base vacía.
 
 Listar clientes:
 ```powershell
-Invoke-RestMethod http://localhost:3001/clientes
+Invoke-RestMethod http://localhost:2501/clientes
 ```
 
 Crear cliente:
 ```powershell
 $body = @{ nombre = "María Torres"; correo = "maria@example.com" } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri http://localhost:3001/clientes -ContentType "application/json" -Body $body
+Invoke-RestMethod -Method Post -Uri http://localhost:2501/clientes -ContentType "application/json" -Body $body
 ```
 
 Listar productos:
 ```powershell
-Invoke-RestMethod http://localhost:3002/productos
+Invoke-RestMethod http://localhost:2502/productos
 ```
 
 Crear producto:
 ```powershell
 $body = @{ nombre = "Teclado USB"; precio = 450; stock = 10 } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri http://localhost:3002/productos -ContentType "application/json" -Body $body
+Invoke-RestMethod -Method Post -Uri http://localhost:2502/productos -ContentType "application/json" -Body $body
 ```
 
 ## Endpoints
@@ -101,13 +101,13 @@ docker compose down -v
 - `409`: correo de cliente duplicado.
 
 ## Nota de red
-Desde otra computadora, sustituye `localhost` por la IP de la laptop que ejecuta Docker, y permite los puertos TCP 3001 y 3002 en el firewall de Windows.
+Desde otra computadora, sustituye `localhost` por la IP de la laptop que ejecuta Docker, y permite los puertos TCP 2501 y 2502 en el firewall de Windows.
 
 
 ## Contrato de integración con los equipos 2 y 3
 
-Las direcciones base son `http://IP-DEL-EQUIPO-1:3001` para Clientes y
-`http://IP-DEL-EQUIPO-1:3002` para Productos. Sustituye la IP de ejemplo por
+Las direcciones base son `http://IP-DEL-EQUIPO-1:2501` para Clientes y
+`http://IP-DEL-EQUIPO-1:2502` para Productos. Sustituye la IP de ejemplo por
 la IPv4 real de esta computadora; no uses `localhost` desde otra computadora.
 
 ### Clientes
@@ -123,6 +123,6 @@ la IPv4 real de esta computadora; no uses `localhost` desde otra computadora.
 - Los precios se devuelven como `precio`, compatible con el servicio Pedidos del Equipo 2.
 
 ### Comunicación entre computadoras
-Permite los puertos TCP 3001 y 3002 en el firewall de Windows. Desde otra PC
-prueba `http://IP-DEL-EQUIPO-1:3001/health` y
-`http://IP-DEL-EQUIPO-1:3002/health`.
+Permite los puertos TCP 2501 y 2502 en el firewall de Windows. Desde otra PC
+prueba `http://IP-DEL-EQUIPO-1:2501/health` y
+`http://IP-DEL-EQUIPO-1:2502/health`.
