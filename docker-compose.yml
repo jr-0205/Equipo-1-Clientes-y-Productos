@@ -6,8 +6,8 @@ services:
     container_name: equipo1-clientes
     ports:
       # Puerto publicado (host) : puerto interno del contenedor.
-      # El publicado se toma de .env (CLIENTES_HOST_PORT) y debe ser 2501 para el resto de equipos.
-      - "${CLIENTES_HOST_PORT:-2501}:3001"
+      # El publicado se toma de .env (CLIENTES_PORT) y debe ser 2501 para el resto de equipos.
+      - "${CLIENTES_PORT:-2501}:3001"
     environment:
       PORT: "3001"
       DATABASE_PATH: /data/clientes.db
@@ -26,7 +26,7 @@ services:
     build: ./productos
     container_name: equipo1-productos
     ports:
-      - "${PRODUCTOS_HOST_PORT:-2502}:3002"
+      - "${PRODUCTOS_PORT:-2502}:3002"
     environment:
       PORT: "3002"
       DATABASE_PATH: /data/productos.db

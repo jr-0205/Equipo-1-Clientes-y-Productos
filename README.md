@@ -7,7 +7,10 @@ persistente y ejecutados con **Docker Compose**. Cumplen el reglamento común de
 | Documento | Contenido |
 |---|---|
 | Este README | Cómo ejecutar, rutas, contrato de datos y cómo conectar con los equipos 2 y 3 |
-| `../reglas.md` | Reglas de integración de los tres equipos (puertos, red, firewall, checklist) |
+| `../reglas.md` | Acuerdo de integración de los tres equipos (puertos, red, firewall, checklist) |
+| `ROUTES.md` | Rutas y contratos de este equipo (documento compartido con los otros equipos) |
+| `MICROSERVICES_STANDARD.md` | Estándar general de microservicios SuperPOS (acuerdo de los tres equipos) |
+| `.env.example` | Plantilla de configuración común: puertos e IPs/hosts de los tres equipos |
 | `postman/` | Colección Postman lista para probar los dos servicios |
 
 ## 1. Servicios y puertos
@@ -212,6 +215,6 @@ docker compose down -v                      # detener y BORRAR los datos persist
 | El otro equipo no conecta y `ping` funciona | Firewall de Windows | Crear las reglas de la sección 8 |
 | `ping` tampoco funciona | Redes distintas o red de invitados con aislamiento | Usar la misma LAN y perfil Private |
 | La IP de esta PC cambió | IP dinámica (DHCP) | Pedir IP fija/reserva y avisar a los equipos 2 y 3 |
-| `docker compose up` falla porque el puerto está ocupado | Otro servicio usa 2501/2502 | Ajustar `CLIENTES_HOST_PORT`/`PRODUCTOS_HOST_PORT` en `.env` **y avisar** a los otros equipos |
+| `docker compose up` falla porque el puerto está ocupado | Otro servicio usa 2501/2502 | Ajustar `CLIENTES_PORT`/`PRODUCTOS_PORT` en `.env` **y avisar** a los otros equipos |
 | Los servicios se ven `unhealthy` | La base no inicializó | `docker compose logs clientes productos` y `docker compose down -v` solo si se acepta borrar datos |
 | `409` al crear cliente | El correo ya existe | Usar otro correo o actualizar el cliente existente |
