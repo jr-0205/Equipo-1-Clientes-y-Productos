@@ -1,128 +1,217 @@
-# Equipo 1: Microservicios de Clientes y Productos
+# Equipo 1 — Microservicios de Clientes y Productos
 
-Proyecto de dos microservicios Node.js + Express, cada uno con su propia base de datos SQLite persistente y ejecutados con Docker Compose.
+Dos microservicios **Node.js + Express**, cada uno con su propia base de datos **SQLite**
+persistente y ejecutados con **Docker Compose**. Cumplen el reglamento común del proyecto
+(`../reglas.md`).
 
-## Tecnologías
-- Node.js 20 y Express
-- APIs REST con JSON
-- SQLite independiente para cada servicio
-- Docker y Docker Compose v2
-- Postman para pruebas HTTP
+| Documento | Contenido |
+|---|---|
+| Este README | Cómo ejecutar, rutas, contrato de datos y cómo conectar con los equipos 2 y 3 |
+| `../reglas.md` | Reglas de integración de los tres equipos (puertos, red, firewall, checklist) |
+| `postman/` | Colección Postman lista para probar los dos servicios |
 
-## Arquitectura
+## 1. Servicios y puertos
 
-| Servicio | Puerto publicado | Puerto interno | Base de datos | Función |
-|---|---:|---|---|
-| Clientes | 2501 | 3001 | SQLite (`clientes_data`) | CRUD de clientes |
-| Productos | 2502 | 3002 | SQLite (`productos_data`) | CRUD de productos |
+| Servicio | Puerto interno (contenedor) | Puerto publicado (host) | URL desde otra PC | Base de datos |
+|---|---:|---:|---|---|
+| **clientes** | 3001 | **2501** | `http://IP-EQUIPO-1:2501` | SQLite `clientes_data` |
+| **productos** | 3002 | **2502** | `http://IP-EQUIPO-1:2502` | SQLite `productos_data` |
 
-Cada servicio es independiente. Los datos se guardan en volúmenes Docker para sobrevivir al reinicio de los contenedores.
+- Dentro de esta computadora los servicios se ven como `http://clientes:3001` y
+  `http://productos:3002` (red Docker `equipo1-net`).
+- Entre computadoras **solo** funciona la IP de esta PC con los puertos publicados
+  **2501** y **2502**. Nunca uses `localhost` desde otro equipo ni el nombre del
+  contenedor como hostname.
 
-## Ejecutar desde una laptop nueva
+## 2. Estructura
+
+```text
+Equipo-1-Clientes-y-Productos/
+|-- clientes/
+|   |-- app.js
+|   |-- package.json
+|   |-- Dockerfile
+|-- productos/
+|   |-- app.js
+|   |-- package.json
+|   |-- Dockerfile
+|-- postman/
+|   |-- Equipo-1-Clientes-Productos.postman_collection.json
+|-- docker-compose.yml
+|-- .env.example
+|-- README.md
+```
+
+## 3. Requisitos
+
+- Docker Desktop instalado y **en ejecución** (en Windows, con Docker Compose v2).
+- PowerShell para las pruebas.
+- Nada de Node.js local: todo corre dentro de los contenedores.
+
+## 4. Ejecutar
 
 ```powershell
 git clone https://github.com/jr-0205/Equipo-1-Clientes-y-Productos.git
 cd Equipo-1-Clientes-y-Productos
+Copy-Item .env.example .env      # configura los puertos publicados (2501 y 2502)
 docker compose up --build -d
-docker compose ps
+docker compose ps                # ambos servicios deben aparecer "healthy"
 ```
 
-## Probar que funcionan
+Abre en el navegador de esta PC:
 
-Abre estas direcciones en el navegador:
-- http://localhost:2501/
-- http://localhost:2501/health
+- http://localhost:2501/ y http://localhost:2501/health
 - http://localhost:2501/clientes
-- http://localhost:2502/
-- http://localhost:2502/health
+- http://localhost:2502/ y http://localhost:2502/health
 - http://localhost:2502/productos
 
-Los servicios incluyen datos de ejemplo al inicializar una base vacía.
+Los servicios insertan datos de ejemplo cuando la base está vacía.
 
-## Ejemplos de PowerShell
+## 5. Rutas (documentación para los equipos 2 y 3)
 
-Listar clientes:
+### clientes — base `http://IP-EQUIPO-1:2501`
+
+| Método | Ruta | Función | Cuerpo (JSON) | Respuesta correcta |
+|---|---|---|---|---|
+| GET | `/` | Información del servicio y rutas | — | `200` |
+| GET | `/health` | Estado del servicio y de la base | — | `200` |
+| GET | `/clientes` | Lista clientes | — | `200` + arreglo |
+| GET | `/clientes/:id` | Consulta un cliente | — | `200` + objeto |
+| POST | `/clientes` | Crea cliente | `{ "nombre": "...", "correo": "..." }` | `201` + objeto creado |
+| PUT | `/clientes/:id` | Reemplaza `nombre` y `correo` | `{ "nombre": "...", "correo": "..." }` | `200` + objeto |
+| PATCH | `/clientes/:id` | Actualiza solo los campos enviados | `{ "correo": "..." }` | `200` + objeto |
+| DELETE | `/clientes/:id` | Elimina un cliente | — | `200` + `{ mensaje, id }` |
+
+### productos — base `http://IP-EQUIPO-1:2502`
+
+| Método | Ruta | Función | Cuerpo (JSON) | Respuesta correcta |
+|---|---|---|---|---|
+| GET | `/` | Información del servicio y rutas | — | `200` |
+| GET | `/health` | Estado del servicio y de la base | — | `200` |
+| GET | `/productos` | Lista productos | — | `200` + arreglo |
+| GET | `/productos/:id` | Consulta un producto | — | `200` + objeto |
+| POST | `/productos` | Crea producto | `{ "nombre": "...", "precio": 100, "stock": 5 }` | `201` + objeto creado |
+| PUT | `/productos/:id` | Reemplaza los campos | `{ "nombre": "...", "precio": 100, "stock": 5 }` | `200` + objeto |
+| PATCH | `/productos/:id` | Actualiza solo los campos enviados | `{ "precio": 120 }` | `200` + objeto |
+| DELETE | `/productos/:id` | Elimina un producto | — | `200` + `{ mensaje, id }` |
+
+### Códigos de error (JSON en todos los casos)
+
+| Código | Cuándo | Ejemplo de respuesta |
+|---|---|---|
+| `400` | Falta un campo obligatorio, `precio`/`stock` inválido o `id` no numérico | `{ "error": "El campo 'correo' es obligatorio" }` |
+| `404` | No existe el `id` o la ruta | `{ "error": "Cliente no encontrado" }` |
+| `409` | `correo` de cliente duplicado | `{ "error": "Ya existe un cliente con ese correo" }` |
+| `500` / `503` | Error interno o base no disponible | `{ "error": "Error interno del servicio clientes" }` |
+
+## 6. Contrato de datos (nombres oficiales entre equipos)
+
+| Recurso | Respuesta oficial | Petición oficial |
+|---|---|---|
+| Clientes | `id`, `nombre`, `correo` | `nombre`, `correo` |
+| Productos | `id`, `nombre`, `precio`, `stock` | `nombre`, `precio`, `stock` (`stock` opcional, toma `0`) |
+
+- **No** uses alias como `name`, `email` o `price` en las peticiones entre servicios.
+- `stock` en Productos es **informativo**. El stock real se consulta y actualiza en el
+  microservicio **Inventario del Equipo 3**.
+- El `id` del producto debe corresponder con el `productoId` del inventario del Equipo 3,
+  porque Pedidos usa ese ID para verificar y descontar existencias.
+
+## 7. Integración con los equipos 2 y 3
+
+Los otros equipos **no** configuran nada dentro de este repositorio: ellos escriben la IP de
+esta computadora en **su** archivo `.env`.
+
+Equipo 2 (`Equipo-2-Pedidos-y-Pagos/.env`):
+
+```env
+CLIENTES_URL=http://IP-EQUIPO-1:2501
+PRODUCTOS_URL=http://IP-EQUIPO-1:2502
+```
+
+Equipo 3 / frontend (`SuperPOS`, panel **Conexiones API**):
+
+- Clientes → `http://IP-EQUIPO-1:2501` (rutas `/clientes`)
+- Productos → `http://IP-EQUIPO-1:2502` (rutas `/productos`)
+
+Si el Equipo 3 usa su Nginx como proxy, debe apuntar con variables de entorno, no con una
+IP escrita a mano:
+
+```nginx
+location /clientes  { proxy_pass ${CLIENTES_URL}/clientes;  }
+location /productos { proxy_pass ${PRODUCTOS_URL}/productos; }
+```
+
+### Datos de contacto de este equipo (llenar y compartir)
+
+| Dato | Valor |
+|---|---|
+| Integrantes | |
+| IPv4 de la laptop (`ipconfig`) | |
+| Hostname (`hostname`) | |
+| Puertos publicados | 2501 (clientes), 2502 (productos) |
+| Firewall abierto | ☐ 2501 ☐ 2502 |
+
+## 8. Firewall de Windows (en esta computadora)
+
 ```powershell
+New-NetFirewallRule -DisplayName "Micro E1 Clientes 2501"  -Direction Inbound -Protocol TCP -LocalPort 2501 -Action Allow
+New-NetFirewallRule -DisplayName "Micro E1 Productos 2502" -Direction Inbound -Protocol TCP -LocalPort 2502 -Action Allow
+Get-NetFirewallRule -DisplayName "Micro E1*" | Select-Object DisplayName, Enabled, Action
+Get-NetConnectionProfile     # el perfil de red debe ser Private, no Public
+```
+
+## 9. Comprobaciones (obligatorias antes de la demostración)
+
+Desde **esta** computadora:
+
+```powershell
+Invoke-RestMethod http://localhost:2501/health
 Invoke-RestMethod http://localhost:2501/clientes
-```
-
-Crear cliente:
-```powershell
-$body = @{ nombre = "María Torres"; correo = "maria@example.com" } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri http://localhost:2501/clientes -ContentType "application/json" -Body $body
-```
-
-Listar productos:
-```powershell
+Invoke-RestMethod http://localhost:2502/health
 Invoke-RestMethod http://localhost:2502/productos
 ```
 
-Crear producto:
+Desde **otra** computadora (sustituye la IP real):
+
 ```powershell
+Test-Connection 192.168.1.101 -Count 2                        # ping
+Test-NetConnection 192.168.1.101 -Port 2501                    # TCP abierto
+Test-NetConnection 192.168.1.101 -Port 2502
+Invoke-RestMethod http://192.168.1.101:2501/health
+Invoke-RestMethod http://192.168.1.101:2502/health
+```
+
+Pruebas rápidas de escritura (POST):
+
+```powershell
+$body = @{ nombre = "María Torres"; correo = "maria@example.com" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://localhost:2501/clientes -ContentType "application/json" -Body $body
+
 $body = @{ nombre = "Teclado USB"; precio = 450; stock = 10 } | ConvertTo-Json
 Invoke-RestMethod -Method Post -Uri http://localhost:2502/productos -ContentType "application/json" -Body $body
 ```
 
-## Endpoints
+Con Postman: importa `postman/Equipo-1-Clientes-Productos.postman_collection.json` y cambia
+la variable `host` por la IP de esta computadora.
 
-Ambos servicios tienen:
-- `GET /`: información y endpoints disponibles.
-- `GET /health`: estado del servicio.
-- `GET /<recurso>`: lista de registros.
-- `GET /<recurso>/<id>`: consulta un registro.
-- `POST /<recurso>`: crea un registro.
-- `PUT /<recurso>/<id>`: reemplaza los campos editables.
-- `DELETE /<recurso>/<id>`: elimina un registro.
+## 10. Administración
 
-Contrato único de datos (nombres en español): Clientes usa `id`, `nombre` y `correo`; Productos usa `id`, `nombre`, `precio` y `stock`. No se deben usar alias como `email`, `name` o `price` en las solicitudes entre servicios.
-
-## Administración
-
-Ver logs:
 ```powershell
-docker compose logs -f
+docker compose logs -f                      # ver registros
+docker compose logs --tail=100 clientes productos
+docker compose ps                           # estado y salud
+docker compose down                         # detener
+docker compose down -v                      # detener y BORRAR los datos persistentes (destructivo)
 ```
 
-Detener servicios:
-```powershell
-docker compose down
-```
+## 11. Problemas comunes
 
-Detener y borrar también los datos persistentes (acción destructiva):
-```powershell
-docker compose down -v
-```
-
-## Códigos de respuesta comunes
-- `200`: operación correcta.
-- `201`: registro creado.
-- `400`: datos inválidos o faltantes.
-- `404`: registro no encontrado.
-- `409`: correo de cliente duplicado.
-
-## Nota de red
-Desde otra computadora, sustituye `localhost` por la IP de la laptop que ejecuta Docker, y permite los puertos TCP 2501 y 2502 en el firewall de Windows.
-
-
-## Contrato de integración con los equipos 2 y 3
-
-Las direcciones base son `http://IP-DEL-EQUIPO-1:2501` para Clientes y
-`http://IP-DEL-EQUIPO-1:2502` para Productos. Sustituye la IP de ejemplo por
-la IPv4 real de esta computadora; no uses `localhost` desde otra computadora.
-
-### Clientes
-- `GET /clientes` y `GET /clientes/:id`
-- `POST /clientes` y `PUT /clientes/:id` usan exclusivamente `{ "nombre": "...", "correo": "..." }`.
-- La respuesta devuelve exclusivamente `id`, `nombre` y `correo`. `correo` es el nombre oficial del campo de correo electrónico para los tres equipos.
-
-### Productos
-- `GET /productos` y `GET /productos/:id`
-- `POST /productos` y `PUT /productos/:id` usan `{ "nombre": "...", "precio": 100, "stock": 5 }`. Los nombres oficiales son `nombre` y `precio` (no `name` ni `price`).
-  `stock` es opcional y toma el valor 0 si se omite, porque el stock definitivo
-  debe consultarse y actualizarse en el microservicio Inventario del Equipo 3.
-- Los precios se devuelven como `precio`, compatible con el servicio Pedidos del Equipo 2.
-
-### Comunicación entre computadoras
-Permite los puertos TCP 2501 y 2502 en el firewall de Windows. Desde otra PC
-prueba `http://IP-DEL-EQUIPO-1:2501/health` y
-`http://IP-DEL-EQUIPO-1:2502/health`.
+| Síntoma | Causa probable | Solución |
+|---|---|---|
+| El otro equipo no conecta y `ping` funciona | Firewall de Windows | Crear las reglas de la sección 8 |
+| `ping` tampoco funciona | Redes distintas o red de invitados con aislamiento | Usar la misma LAN y perfil Private |
+| La IP de esta PC cambió | IP dinámica (DHCP) | Pedir IP fija/reserva y avisar a los equipos 2 y 3 |
+| `docker compose up` falla porque el puerto está ocupado | Otro servicio usa 2501/2502 | Ajustar `CLIENTES_HOST_PORT`/`PRODUCTOS_HOST_PORT` en `.env` **y avisar** a los otros equipos |
+| Los servicios se ven `unhealthy` | La base no inicializó | `docker compose logs clientes productos` y `docker compose down -v` solo si se acepta borrar datos |
+| `409` al crear cliente | El correo ya existe | Usar otro correo o actualizar el cliente existente |

@@ -1,14 +1,20 @@
+name: equipo1
+
 services:
   clientes:
     build: ./clientes
     container_name: equipo1-clientes
     ports:
-      - "2501:3001"
+      # Puerto publicado (host) : puerto interno del contenedor.
+      # El publicado se toma de .env (CLIENTES_HOST_PORT) y debe ser 2501 para el resto de equipos.
+      - "${CLIENTES_HOST_PORT:-2501}:3001"
     environment:
       PORT: "3001"
       DATABASE_PATH: /data/clientes.db
     volumes:
       - clientes_data:/data
+    networks:
+      - equipo1-net
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3001/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
@@ -20,18 +26,26 @@ services:
     build: ./productos
     container_name: equipo1-productos
     ports:
-      - "2502:3002"
+      - "${PRODUCTOS_HOST_PORT:-2502}:3002"
     environment:
       PORT: "3002"
       DATABASE_PATH: /data/productos.db
     volumes:
       - productos_data:/data
+    networks:
+      - equipo1-net
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3002/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+networks:
+  # Red interna del Equipo 1: dentro de esta computadora los servicios se ven
+  # como http://clientes:3001 y http://productos:3002.
+  equipo1-net:
+    driver: bridge
 
 volumes:
   clientes_data:

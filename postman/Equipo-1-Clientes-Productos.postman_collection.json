@@ -1,0 +1,184 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-1111-4a2b-9c3d-equipo1clientesprod",
+    "name": "Equipo 1 - Clientes y Productos",
+    "description": "Colección para probar los microservicios del Equipo 1 con los puertos publicados por Docker Compose: Clientes 2501 y Productos 2502.\n\nAntes de ejecutar, cambia la variable {{host}} por la IPv4 de la computadora del Equipo 1 (o deja 'localhost' si Postman corre en esa misma máquina). Verifícala con: ipconfig",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "host",
+      "value": "localhost"
+    }
+  ],
+  "item": [
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Health clientes",
+          "request": {
+            "method": "GET",
+            "url": "http://{{host}}:2501/health"
+          }
+        },
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "url": "http://{{host}}:2501/clientes"
+          }
+        },
+        {
+          "name": "Consultar cliente",
+          "request": {
+            "method": "GET",
+            "url": "http://{{host}}:2501/clientes/1"
+          }
+        },
+        {
+          "name": "Crear cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"María Torres\",\n  \"correo\": \"maria@example.com\"\n}"
+            },
+            "url": "http://{{host}}:2501/clientes"
+          }
+        },
+        {
+          "name": "Actualizar cliente (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"María Torres Ruiz\",\n  \"correo\": \"maria.torres@example.com\"\n}"
+            },
+            "url": "http://{{host}}:2501/clientes/1"
+          }
+        },
+        {
+          "name": "Editar cliente (PATCH parcial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"nuevo.correo@example.com\"\n}"
+            },
+            "url": "http://{{host}}:2501/clientes/1"
+          }
+        },
+        {
+          "name": "Eliminar cliente",
+          "request": {
+            "method": "DELETE",
+            "url": "http://{{host}}:2501/clientes/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Health productos",
+          "request": {
+            "method": "GET",
+            "url": "http://{{host}}:2502/health"
+          }
+        },
+        {
+          "name": "Listar productos",
+          "request": {
+            "method": "GET",
+            "url": "http://{{host}}:2502/productos"
+          }
+        },
+        {
+          "name": "Consultar producto",
+          "request": {
+            "method": "GET",
+            "url": "http://{{host}}:2502/productos/1"
+          }
+        },
+        {
+          "name": "Crear producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Teclado USB\",\n  \"precio\": 450,\n  \"stock\": 10\n}"
+            },
+            "url": "http://{{host}}:2502/productos"
+          }
+        },
+        {
+          "name": "Actualizar producto (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Teclado USB mecánico\",\n  \"precio\": 599,\n  \"stock\": 12\n}"
+            },
+            "url": "http://{{host}}:2502/productos/1"
+          }
+        },
+        {
+          "name": "Editar precio (PATCH parcial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"precio\": 649\n}"
+            },
+            "url": "http://{{host}}:2502/productos/1"
+          }
+        },
+        {
+          "name": "Eliminar producto",
+          "request": {
+            "method": "DELETE",
+            "url": "http://{{host}}:2502/productos/1"
+          }
+        }
+      ]
+    }
+  ]
+}

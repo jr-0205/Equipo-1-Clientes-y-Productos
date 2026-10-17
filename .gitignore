@@ -1,0 +1,15 @@
+# Dependencias
+node_modules/
+
+# Bases de datos SQLite locales (los datos reales viven en el volumen de Docker)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Configuracion local con IPs reales: nunca se versiona
+.env
+
+# Registros
+npm-debug.log*
+*.log
