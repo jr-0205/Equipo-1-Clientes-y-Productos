@@ -9,6 +9,7 @@ node_modules/
 
 # Configuracion local con IPs reales: nunca se versiona
 .env
+.env.respaldo
 
 # Registros
 npm-debug.log*

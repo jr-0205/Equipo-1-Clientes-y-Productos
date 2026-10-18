@@ -56,10 +56,29 @@ Equipo-1-Clientes-y-Productos/
 ```powershell
 git clone https://github.com/jr-0205/Equipo-1-Clientes-y-Productos.git
 cd Equipo-1-Clientes-y-Productos
-Copy-Item .env.example .env      # configura los puertos publicados (2501 y 2502)
+node configurar-ips.mjs          # genera el .env a partir de ip-path
 docker compose up --build -d
 docker compose ps                # ambos servicios deben aparecer "healthy"
 ```
+
+### Configurar las direcciones de todos los equipos (`ip-path`)
+
+`ip-path` es la **única fuente de verdad** de las direcciones: se edita una vez y un comando
+genera el `.env` de este repositorio (que es local y no se versiona).
+
+```powershell
+notepad ip-path                  # IP de cada laptop; deja `auto` en esta PC
+node configurar-ips.mjs          # genera el .env
+node configurar-ips.mjs --probar # además prueba /health de cada dirección
+```
+
+- `auto` significa "ese equipo corre en esta computadora"; para los contenedores se traduce
+  en `host.docker.internal`.
+- Este equipo publica **2501** y **2502**; los demás te alcanzan en
+  `http://IP-EQUIPO-1:2501` y `http://IP-EQUIPO-1:2502`.
+- Antes de sobrescribir un `.env` existente se guarda una copia en `.env.respaldo`.
+- Si los cuatro repositorios están en la misma carpeta, se configura todo de una vez desde la
+  raíz del proyecto con `node configurar-ips.mjs`.
 
 Abre en el navegador de esta PC:
 
